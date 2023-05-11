@@ -3,13 +3,13 @@ package main
 import (
 	"log"
 	myapp "my-app"
-	"my-app/pkg/handler"
-	postgres "my-app/pkg/postgres"
-	"my-app/pkg/repository"
+	"my-app/internal/handler"
+	postgres "my-app/internal/postgres"
+	"my-app/internal/repository"
 )
 
 func main() {
-	db, err := postgres.NewPostrgesConnection("178.20.41.74", "root", "root", 5432, "train-app")
+	db, err := postgres.NewPostrgesConnection("194.87.110.172", "val1", "root", 5432, "my-app")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"my-app/pkg/repository"
+	"my-app/internal/repository"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +24,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
-		//auth.POST("/sign-in", h.signIn)
+		auth.POST("/sign-in", h.signIn)
 	}
 	router.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{

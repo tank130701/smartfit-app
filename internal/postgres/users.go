@@ -20,10 +20,10 @@ func NewUsersPostgres(db *sql.DB) *UsersPostgres {
 
 func (m *UsersPostgres) SaveUser(user *models.User) (int64, error) {
 	var LastInsertId int
-	query := fmt.Sprintf("INSERT INTO %s (username, password_hash, age, weight, sex) VALUES ($1, $2, $3, $4, $5) RETURNING id", usersTable)
+	query := fmt.Sprintf("INSERT INTO %s (username, password_hash) VALUES ($1, $2) RETURNING id", usersTable)
 
 	err := m.db.QueryRow(
-		query, user.Username, user.PasswordHash, user.Age, user.Weight, user.Sex).Scan(&LastInsertId)
+		query, user.Username, user.PasswordHash).Scan(&LastInsertId)
 	if err != nil {
 		return 0, err
 	}
@@ -46,7 +46,7 @@ func (m *UsersPostgres) GetUserByUsername(username string) (*models.User, error)
 
 	user := new(models.User)
 
-	err := row.Scan(&user.ID, &user.Username, &user.Age, &user.Weight, &user.Sex, &user.PasswordHash, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Username, &user.PasswordHash, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (m *UsersPostgres) GetUserByID(id int64) (*models.User, error) {
 
 	user := new(models.User)
 
-	err := row.Scan(&user.ID, &user.Username, &user.Age, &user.Weight, &user.Sex, &user.PasswordHash, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Username, &user.PasswordHash, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -87,23 +87,19 @@ func (m *UsersPostgres) GetUsers() ([]*models.User, error) {
 	}
 
 	users := make([]*models.User, 0, 1)
-	var id, age, weight int64
+	var id int64
 	var username string
-	var sex bool
 	var passwordHash []byte
 	var createdAt time.Time
 
 	for rows.Next() {
-		err = rows.Scan(&id, &username, &age, &weight, &sex, &passwordHash, &createdAt)
+		err = rows.Scan(&id, &username, &passwordHash, &createdAt)
 		if err != nil {
 			return nil, err
 		}
 		users = append(users, &models.User{
 			ID:           id,
 			Username:     username,
-			Age:          int(age),
-			Weight:       int(weight),
-			Sex:          sex,
 			PasswordHash: passwordHash,
 			CreatedAt:    createdAt,
 		})

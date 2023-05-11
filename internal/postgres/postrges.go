@@ -10,7 +10,7 @@ import (
 const (
 	usersTable        = "Users"
 	//articlesInfoTable = "articles"
-	//sessionsTable     = "sessions"
+	sessionsTable     = "sessions"
 )
 
 

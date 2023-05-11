@@ -13,9 +13,6 @@ import (
 func (h *Handler) signUp(ctx *gin.Context) {
 	input := &struct {
 		Username string `json:"username"`
-		Age      int    `json:"age"`
-		Sex      bool   `json:"sex"`
-		Weight   int    `json:"weight"`
 		Password string `json:"password"`
 	}{}
 
@@ -39,9 +36,6 @@ func (h *Handler) signUp(ctx *gin.Context) {
 
 	user := &models.User{
 		Username:     input.Username,
-		Age:          input.Age,
-		Sex:          input.Sex,
-		Weight:       input.Weight,
 		PasswordHash: hash,
 	}
 
@@ -77,13 +71,19 @@ func (h *Handler) signIn(ctx *gin.Context) {
 
 	user, err := h.repository.GetUserByUsername(input.Username)
 	if err != nil {
-		newErrorResponse(ctx, http.StatusUnauthorized, err.Error())
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		log.Println(err)
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword(user.PasswordHash, []byte(input.Password))
 	if err != nil {
-		newErrorResponse(ctx, http.StatusUnauthorized, err.Error())
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		log.Println(err)
 		return
 	}
 
@@ -97,13 +97,19 @@ func (h *Handler) signIn(ctx *gin.Context) {
 
 	id, err := h.repository.SaveSession(newSession)
 	if err != nil {
-		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		log.Println(err)
 		return
 	}
 
 	session, err := h.repository.GetSessionByID(id)
 	if err != nil {
-		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		log.Println(err)
 		return
 	}
 

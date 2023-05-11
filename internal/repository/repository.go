@@ -2,17 +2,15 @@ package repository
 
 // import "my-app/models"
 import (
-	"my-app/pkg/postgres"
 	"database/sql"
 	"my-app/models"
+	postrgres "my-app/internal/postgres"
 )
-
 
 type Repository struct {
 	UserRepository
+	SessionRepository
 }
-
-
 
 type UserRepository interface {
 	SaveUser(user *models.User) (int64, error)
@@ -26,6 +24,12 @@ type UserRepository interface {
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		UserRepository: postrgres.NewUsersPostgres(db),
-		
 	}
+}
+
+type SessionRepository interface {
+	SaveSession(session *models.Session) (int64, error)
+	DeleteSession(id int64) error
+	GetSessionByToken(sessionToken string) (*models.Session, error)
+	GetSessionByID(id int64) (*models.Session, error)
 }
