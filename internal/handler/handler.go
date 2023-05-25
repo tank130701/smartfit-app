@@ -1,20 +1,19 @@
 package handler
 
 import (
+	"my-app/internal/services"
 	"net/http"
-	"my-app/internal/repository"
+
 	"github.com/gin-gonic/gin"
 )
 
-
 type Handler struct {
-	repository *repository.Repository
+	services *services.Service
 }
 
-func NewHandler(repository *repository.Repository) *Handler {
-	
+func NewHandler(services *services.Service) *Handler {
 	return &Handler{
-		repository: repository,
+		services: services,
 	}
 }
 
@@ -26,10 +25,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
 	}
+
 	router.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
-			"message":"pong",
+			"message": "pong",
 		})
 	})
+
+	// h.initAuthRoutes(router)
+
 	return router
 }

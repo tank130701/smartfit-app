@@ -1,58 +1,41 @@
 package handler
 
 import (
-	"log"
-	"my-app/models"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
-	"github.com/google/uuid"
-	"time"
+	// "my-app/internal/models"
 )
+
+// func (h *Handler) initAuthRoutes(router *gin.Engine) {
+// 	auth := router.Group("/auth")
+// 	{
+// 		auth.POST("/sign-up", h.signUp)
+// 		auth.POST("/sign-in", h.signIn)
+// 	}
+// }
 
 func (h *Handler) signUp(ctx *gin.Context) {
 	input := &struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
 	}{}
 
-	err := ctx.BindJSON(input)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		log.Println(err)
+	if err := ctx.BindJSON(&input); err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	id, err := h.services.Auth.CreateUser(input.Username, input.Password)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		log.Println(err)
+		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	user := &models.User{
-		Username:     input.Username,
-		PasswordHash: hash,
-	}
-
-	id, err := h.repository.SaveUser(user)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		log.Println(err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }
-
 
 func (h *Handler) signIn(ctx *gin.Context) {
 	input := &struct {
@@ -60,64 +43,24 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		Password string `json:"password"`
 	}{}
 
-	err := ctx.BindJSON(input)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		log.Println(err)
+	if err := ctx.BindJSON(&input); err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	user, err := h.repository.GetUserByUsername(input.Username)
+	user, err := h.repository.GetUserByNickname(input.Username)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error": err.Error(),
-		})
-		log.Println(err)
+		newErrorResponse(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
+	h.services.Auth.SignIn(input.Username, input.Password)
+	// token, err := h.services.Auth.GenerateToken(input.Username, input.Password)
+	// if err != nil {
+	// 	newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
 
-	err = bcrypt.CompareHashAndPassword(user.PasswordHash, []byte(input.Password))
-	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error": err.Error(),
-		})
-		log.Println(err)
-		return
-	}
-
-	sessionToken := uuid.NewString()
-
-	newSession := &models.Session{
-		Session:   sessionToken,
-		UserID:    user.ID,
-		CreatedAt: time.Now(),
-	}
-
-	id, err := h.repository.SaveSession(newSession)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		log.Println(err)
-		return
-	}
-
-	session, err := h.repository.GetSessionByID(id)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		log.Println(err)
-		return
-	}
-
-	ctx.SetCookie("session_cookie", sessionToken, 3600*24, "/", "localhost", false, true)
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"user":    user,
-		"session": session,
-	})
-
+	// ctx.JSON(http.StatusOK, map[string]interface{}{
+	// 	"token": token,
+	// })
 }
