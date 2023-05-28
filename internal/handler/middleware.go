@@ -1,8 +1,14 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
+	"errors"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+const (
+	userCtx             = "userId"
 )
 
 func (h *Handler) authMiddleware(ctx *gin.Context) {
@@ -36,6 +42,19 @@ func (h *Handler) authMiddleware(ctx *gin.Context) {
 	}
 
 	ctx.Set("user", user)
+	ctx.Set("userId", user.ID)
 }
 
+func getUserId(c *gin.Context) (int, error) {
+	id, ok := c.Get(userCtx)
+	if !ok {
+		return 0, errors.New("user id not found")
+	}
 
+	idInt, ok := id.(int)
+	if !ok {
+		return 0, errors.New("user id is of invalid type")
+	}
+
+	return idInt, nil
+}

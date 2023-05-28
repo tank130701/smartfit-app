@@ -38,13 +38,21 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			user := public.Group("/user")
 			{
 				user.GET("/", h.getUser)
-				user.DELETE("/", h.deleteUser)
-				user.PUT("/", h.updateUser)
+				// user.DELETE("/", h.deleteUser)
+				// user.PUT("/", h.updateUser)
 			}
+			userData := public.Group("/userdata")
+			{
+				userData.POST("/", h.createUserData)
+				userData.GET("/", h.getUserData)
+				// user.DELETE("/", h.deleteUser)
+				// user.PUT("/", h.updateUser)
+			}
+			
 			workouts := public.Group("/workouts")
 			{
-				workouts.GET("/user", h.getUserArticles)
-				workouts.POST("/new", h.saveArticle)
+				workouts.GET("/:id", h.getWorkoutById)
+				// workouts.POST("/new", h.saveArticle)
 			}
 		}
 	}

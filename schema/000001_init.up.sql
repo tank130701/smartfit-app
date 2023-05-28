@@ -8,11 +8,10 @@ CREATE TABLE users
 
 CREATE TABLE users_data
 (
-    id serial primary key,
     user_id int references users(id) on delete cascade not null,
     name varchar(255) not null,
     age int not null,
-    sex boolean not null,
+    sex varchar(255) not null,
     weight int not null,
     height int not null,
     goal varchar(255) not null,

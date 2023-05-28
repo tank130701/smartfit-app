@@ -14,7 +14,7 @@ type Service struct {
 func NewService(r *repository.Repositories) *Service {
 	return &Service{
 		Auth:     NewAuthService(r),
-		UsersData:    NewUsersService(r),
+		UsersData:    NewUsersDataService(r),
 		Workouts: NewWorkoutsService(r),
 	}
 }
@@ -28,11 +28,12 @@ type Auth interface {
 }
 
 type UsersData interface {
-	Get(models.Session) (models.User, error)
-	EditData(user models.User, newData models.UserData) error
+	CreateUserData(userId int, newData models.UserData) (int, error)
+	GetUserData(id int) (models.UserData, error)
+	UpdateUserData(user models.User, newData models.UserData) error
 }
 
 type Workouts interface {
 	Generate(models.User) error
-	Get(models.User) ([]models.Workout, error)
+	GetWorkout(id int) (models.Workout, error)
 }

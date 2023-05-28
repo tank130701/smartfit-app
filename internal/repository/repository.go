@@ -29,8 +29,9 @@ type Authorization interface {
 	UpdateUser(userID int, newUser models.User) error
 }
 type UsersData interface {
-	Create(data models.UserData) (int, error)
+	Create(userid int, data models.UserData) (int, error)
 	Update(userID int, newData models.UserData) error
+	Get(id int) (models.UserData, error)
 }
 
 type Session interface {
@@ -41,6 +42,6 @@ type Session interface {
 }
 
 type Workout interface {
-	GetWorkoutByID(id int64) (models.Workout, error)
+	GetWorkoutByID(id int) (models.Workout, error)
 }
 

@@ -18,8 +18,10 @@ func (s *WorkoutsService) Generate(user models.User) error {
 	panic("implement me")
 }
 
-func (s *WorkoutsService) Get(user models.User) ([]models.Workout, error) {
-	//TODO implement me
-	panic("implement me")
-	
+func (s *WorkoutsService) GetWorkout(id int) (models.Workout, error) {
+	workout, err := s.r.GetWorkoutByID(id)
+	if err != nil {
+		return models.Workout{} ,err
+	}
+	return workout, nil
 }

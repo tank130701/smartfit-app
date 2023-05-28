@@ -60,6 +60,8 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		return
 	}
 
+	ctx.SetCookie("session_cookie", session.Session, 3600*24, "/", "localhost", false, true)
+
 	ctx.JSON(http.StatusOK, map[string]interface{}{
 		"session": session,
 		"sessionId": id,

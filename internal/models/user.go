@@ -13,7 +13,7 @@ type UserData struct {
 	UserID         int    `json:"user_id"`
 	Name           string `json:"name"`
 	Age            int    `json:"age"`
-	Sex            string `json:"sex"`
+	Sex            string   `json:"sex"`
 	Weight         int    `json:"weight"`
 	Height         int    `json:"height"`
 	Goal           string `json:"goal"`
