@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"fmt"
 
 	_ "github.com/lib/pq"
@@ -15,7 +15,7 @@ const (
 	workoutsArchiveTable = "workouts_archive"
 )
 
-func NewPostgresConnection(host string, username string, password string, port int, dbname string) (*sql.DB, error) {
+func NewPostgresConnection(host string, username string, password string, port int, dbname string) (*sqlx.DB, error) {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host,
@@ -24,7 +24,7 @@ func NewPostgresConnection(host string, username string, password string, port i
 		password,
 		dbname,
 	)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := sqlx.Open("postgres", psqlInfo)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 )
 
 type Session struct {
+	ID        int64     `json:"id"`
 	Session   string    `json:"session"`
 	UserID    int       `json:"user_id"`
 	CreatedAt time.Time `json:"created_at"`

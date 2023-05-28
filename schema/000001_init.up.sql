@@ -10,6 +10,7 @@ CREATE TABLE users_data
 (
     id serial primary key,
     user_id int references users(id) on delete cascade not null,
+    name varchar(255) not null,
     age int not null,
     sex boolean not null,
     weight int not null,
@@ -22,16 +23,30 @@ CREATE TABLE users_data
 CREATE TABLE sessions
 (
     id serial primary key,
-    user_id int references users(id) on delete cascade not null,
     session varchar(255) not null,
+    user_id int references users(id) on delete cascade not null,
     created_at timestamp
 );
 
-CREATE TABLE workouts
-(
-    id serial primary key,
-    workout varchar(255) not null,
-    calories int not null
+CREATE TABLE workouts (
+  id SERIAL PRIMARY KEY,
+  date TIMESTAMP NOT NULL,
+  title VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE exercises (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  calories INTEGER NOT NULL
+);
+
+CREATE TABLE workout_exercises (
+  id SERIAL PRIMARY KEY,
+  workout_id INTEGER REFERENCES workouts(id) ON DELETE CASCADE,
+  exercise_id INTEGER REFERENCES exercises(id) ON DELETE CASCADE,
+  sets INTEGER NOT NULL,
+  reps INTEGER NOT NULL,
+  weight FLOAT NOT NULL
 );
 
 CREATE TABLE workouts_archive

@@ -1,16 +1,16 @@
 package repository
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"my-app/internal/models"
 	"fmt"
 )
 
 type UsersDataPostgresRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewUsersDataPostgresRepository(db *sql.DB) *UsersDataPostgresRepository {
+func NewUsersDataPostgresRepository(db *sqlx.DB) *UsersDataPostgresRepository {
 	return &UsersDataPostgresRepository{
 		db: db,
 	}

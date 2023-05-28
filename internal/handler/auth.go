@@ -47,20 +47,21 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		newErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	user, err := h.repository.GetUserByNickname(input.Username)
-	if err != nil {
-		newErrorResponse(ctx, http.StatusUnauthorized, err.Error())
-		return
-	}
-	h.services.Auth.SignIn(input.Username, input.Password)
-	// token, err := h.services.Auth.GenerateToken(input.Username, input.Password)
+	
+	// user, err := h.repository.GetUserByNickname(input.Username)
 	// if err != nil {
-	// 	newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+	// 	newErrorResponse(ctx, http.StatusUnauthorized, err.Error())
 	// 	return
 	// }
+	// h.services.Auth.SignIn(input.Username, input.Password)
+	session, id, err := h.services.Auth.GenerateSession(input.Username, input.Password)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// ctx.JSON(http.StatusOK, map[string]interface{}{
-	// 	"token": token,
-	// })
+	ctx.JSON(http.StatusOK, map[string]interface{}{
+		"session": session,
+		"sessionId": id,
+	})
 }

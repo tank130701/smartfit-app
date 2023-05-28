@@ -6,25 +6,28 @@ import (
 )
 
 type Service struct {
-	Auth     Auth
-	Users    Users
-	Workouts Workouts
+	Auth     
+	UsersData    
+	Workouts 
 }
 
 func NewService(r *repository.Repositories) *Service {
 	return &Service{
 		Auth:     NewAuthService(r),
-		Users:    NewUsersService(r),
+		UsersData:    NewUsersService(r),
 		Workouts: NewWorkoutsService(r),
 	}
 }
 
 type Auth interface {
 	CreateUser(username, password string) (int, error)
-	SignIn(username, password string) (models.Session, error)
+	GenerateSession(username, password string) (models.Session, int64, error)
+	GetSession(sessionToken string) (models.Session, error)
+	DeleteSession(id int64) (error)
+	GetUser(id int) (models.User, error)
 }
 
-type Users interface {
+type UsersData interface {
 	Get(models.Session) (models.User, error)
 	EditData(user models.User, newData models.UserData) error
 }

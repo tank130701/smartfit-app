@@ -31,7 +31,23 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			"message": "pong",
 		})
 	})
-
+	api := router.Group("/api", h.authMiddleware)
+	{
+		public := api.Group("/public")
+		{
+			user := public.Group("/user")
+			{
+				user.GET("/", h.getUser)
+				user.DELETE("/", h.deleteUser)
+				user.PUT("/", h.updateUser)
+			}
+			workouts := public.Group("/workouts")
+			{
+				workouts.GET("/user", h.getUserArticles)
+				workouts.POST("/new", h.saveArticle)
+			}
+		}
+	}
 	// h.initAuthRoutes(router)
 
 	return router
