@@ -18,10 +18,14 @@ func (s *WorkoutsService) Generate(user models.User) error {
 	panic("implement me")
 }
 
+func (s *WorkoutsService) InsertWorkout(workout models.Workout) (int, error) {
+	return s.r.Workout.InsertWorkout(workout)
+}
+
 func (s *WorkoutsService) GetWorkout(id int) (models.Workout, error) {
 	workout, err := s.r.GetWorkoutByID(id)
 	if err != nil {
-		return models.Workout{} ,err
+		return models.Workout{}, err
 	}
 	return workout, nil
 }

@@ -37,7 +37,7 @@ func (s *AuthService) CreateUser(username, password string) (int, error) {
 func (s *AuthService) GenerateSession(username, password string) (models.Session, int64, error) {
 	hash := fmt.Sprintf("%x", generatePasswordHash(password)) 
 	user, err := s.r.Authorization.GetUser(username, hash)
-	fmt.Println("User: ", user)
+	// fmt.Println("User: ", user)
 	if err != nil {
 		return models.Session{}, 0, err
 	}
@@ -48,18 +48,18 @@ func (s *AuthService) GenerateSession(username, password string) (models.Session
 		UserID:    user.ID,
 		CreatedAt: time.Now(),
 	}
-	fmt.Println("newSession: ",newSession)
+	// fmt.Println("newSession: ",newSession)
 
 	id, err := s.r.Session.SaveSession(*newSession)
 	if err != nil {
 		return models.Session{}, id ,err
 	}
-	fmt.Println("SessionID: ",id)
+	// fmt.Println("SessionID: ",id)
 	session, err := s.r.Session.GetSessionByToken(sessionToken)
 	if err != nil {
 		return models.Session{}, id ,err
 	}
-	fmt.Println("Session: ",session)
+	// fmt.Println("Session: ",session)
 	return session, id, nil	
 }
 

@@ -36,4 +36,5 @@ type UsersData interface {
 type Workouts interface {
 	Generate(models.User) error
 	GetWorkout(id int) (models.Workout, error)
+	InsertWorkout(workout models.Workout) (int, error)
 }

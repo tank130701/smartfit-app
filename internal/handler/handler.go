@@ -52,7 +52,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			workouts := public.Group("/workouts")
 			{
 				workouts.GET("/:id", h.getWorkoutById)
-				// workouts.POST("/new", h.saveArticle)
+				workouts.POST("/new", h.insertWorkout)
 			}
 		}
 	}
