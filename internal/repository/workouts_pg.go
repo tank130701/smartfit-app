@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"fmt"
+	"encoding/json"
 	"my-app/internal/models"
 
 	"github.com/jmoiron/sqlx"
@@ -18,62 +18,84 @@ func NewWorkoutsPostgresRepository(db *sqlx.DB) *WorkoutsPostgresRepository {
 	}
 }
 
-func (m *WorkoutsPostgresRepository) InsertWorkout(workout models.Workout) (int,error) {
-    tx, err := m.db.Begin()
-    if err != nil {
-        return 0, err
-    }
+func (m *WorkoutsPostgresRepository) InsertWorkout(workout models.Workout) (int64, error) {
+	tx := m.db.MustBegin()
+	defer tx.Rollback()
 
-    // Добавляем запись для таблицы Workout
-    var workoutID int
-    err = tx.QueryRow(`
-        INSERT INTO workouts (date, title)
-        VALUES ($1, $2)
-        RETURNING id;
-    `, workout.Date, workout.Title).Scan(&workoutID)
-    if err != nil {
-        tx.Rollback()
-        return 0, err
-    }
-
-    // Добавляем запись для таблицы Exercises
-    for _, exercise := range workout.Exercises {
-        var exerciseID int
-        err = tx.QueryRow(`
-            INSERT INTO exercises (title, calories)
+	// Вставляем данные в таблицу workouts
+	var workoutID int64
+	err := tx.QueryRow(`
+            INSERT INTO workouts (date, title)
             VALUES ($1, $2)
-            RETURNING id;
-        `, exercise.Title, exercise.Calories).Scan(&exerciseID)
-        if err != nil {
-            tx.Rollback()
-            return 0, err
-        }
+            RETURNING id`, workout.Date, workout.Title).Scan(&workoutID)
+	if err != nil {
+		return 0, err
+	}
 
-        // Добавляем записи для таблицы WorkoutExercises
-        _, err = tx.Exec(`
-            INSERT INTO workout_exercises (workout_id, exercise_id, reps)
-            VALUES ($1, $2, $3);
-        `, workoutID, exerciseID, pq.Array(exercise.Reps))
-        if err != nil {
-            tx.Rollback()
-            return 0, err
-        }
-    }
+	// Вставляем данные в таблицу exercises и workout_exercises
+	for _, exercise := range workout.Exercises {
+		var exerciseID int64
+		err = tx.QueryRow(`
+                INSERT INTO exercises (title, sets, reps, weights, calories)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING id`, exercise.Title, exercise.Sets, pq.Array(exercise.Reps), pq.Array(exercise.Weights), exercise.Calories).Scan(&exerciseID)
+		if err != nil {
+			return 0, err
+		}
 
-    // Заканчиваем транзакцию
-    err = tx.Commit()
-    if err != nil {
-        return 0, err
-    }
+		// Связываем упражнение с тренировкой в таблице workout_exercises
+		_, err = tx.Exec(`
+                INSERT INTO workout_exercises (workout_id, exercise_id)
+                VALUES ($1, $2)`, workoutID, exerciseID)
+		if err != nil {
+			return 0, err
+		}
+	}
 
-    return workoutID, nil
+	// Если все прошло успешно, фиксируем транзакцию
+	err = tx.Commit()
+	if err != nil {
+		return 0, err
+	}
+
+	return workoutID, nil
 }
 
-func (m *WorkoutsPostgresRepository) GetWorkoutByID(id int) (models.Workout, error) {
-	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", workoutsTable)
-	row := m.db.QueryRow(query, id)
-	workout := new(models.Workout)
-	err := row.Scan(&workout.ID, &workout.Title, &workout.Exercises, &workout.Date, &workout.WorkoutExercises)
 
-	return *workout, err
+func (m *WorkoutsPostgresRepository) GetWorkoutByID(id int) (models.Workout, error) {
+	var w models.Workout
+    err := m.db.Get(&w, `
+        SELECT *
+        FROM workouts
+        WHERE id = $1`, id)
+    if err != nil {
+        return models.Workout{}, err
+    }
+
+    // Запрашиваем данные упражнений, связанных с этой тренировкой
+    // exercises := []*models.Exercise{}
+    var exercises []models.Exercise
+    err = m.db.Select(&exercises, `
+        SELECT e.*
+        FROM exercises e
+        JOIN workout_exercises we ON we.exercise_id = e.id
+        WHERE we.workout_id = $1`, id)
+    if err != nil {
+        return models.Workout{}, err
+    }
+
+    // Присваиваем полученные данные упражнений соответствующему полю в тренировке
+    w.Exercises = exercises
+
+    return w, nil
+}
+
+
+func scanReps(reps []uint8) ([]int, error) {
+    var result []int
+    err := json.Unmarshal(reps, &result)
+    if err != nil {
+        return nil, err
+    }
+    return result, nil
 }

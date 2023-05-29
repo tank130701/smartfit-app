@@ -18,7 +18,7 @@ func (s *WorkoutsService) Generate(user models.User) error {
 	panic("implement me")
 }
 
-func (s *WorkoutsService) InsertWorkout(workout models.Workout) (int, error) {
+func (s *WorkoutsService) InsertWorkout(workout models.Workout) (int64, error) {
 	return s.r.Workout.InsertWorkout(workout)
 }
 

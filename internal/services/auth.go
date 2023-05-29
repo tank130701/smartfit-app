@@ -69,7 +69,7 @@ func (s *AuthService) GetSession(sessionToken string) (models.Session, error) {
 	if err != nil {
 		return models.Session{} ,err
 	}
-	fmt.Println("Session: ",session)
+	// fmt.Println("Session: ",session)
 	return session, nil	
 }
 
@@ -85,7 +85,7 @@ func (s *AuthService) DeleteSession(id int64) (error) {
 
 func (s *AuthService) GetUser(id int) (models.User, error) {
 	user, err := s.r.Authorization.GetUserByID(id)
-	fmt.Println("User: ", user)
+	// fmt.Println("User: ", user)
 	if err != nil {
 		return models.User{}, err
 	}

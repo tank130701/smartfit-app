@@ -21,9 +21,10 @@ func NewUsersDataPostgresRepository(db *sqlx.DB) *UsersDataPostgresRepository {
 func (r *UsersDataPostgresRepository) Create(userId int, userData models.UserData) (int, error) {
 	//TODO implement me
 	//panic("implement me")
+	fmt.Println(userData)
 	var LastInsertId int
 	query := fmt.Sprintf(
-	"INSERT INTO %s (user_id, name, age, sex, weight, height, goal, place, calories_intake) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id", usersDataTable)
+	"INSERT INTO %s (user_id, name, age, sex, weight, height, goal, place, calories_intake) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING user_id", usersDataTable)
 	err := r.db.QueryRow(
 		query, userId, userData.Name, userData.Age, userData.Sex, userData.Weight, userData.Height, userData.Goal,
 		userData.Place, userData.CaloriesIntake).Scan(&LastInsertId)

@@ -34,17 +34,18 @@ CREATE TABLE workouts (
 );
 
 CREATE TABLE exercises (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  calories INTEGER NOT NULL
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    sets INTEGER NOT NULL,
+    reps INTEGER[] NOT NULL,
+    weights INTEGER[] NOT NULL,
+    calories INTEGER NOT NULL
 );
 
 CREATE TABLE workout_exercises (
-  id SERIAL PRIMARY KEY,
-  workout_id INTEGER REFERENCES workouts(id) ON DELETE CASCADE,
-  exercise_id INTEGER REFERENCES exercises(id) ON DELETE CASCADE,
-  reps INTEGER[] NOT NULL,
-  weight FLOAT NOT NULL
+    workout_id INTEGER REFERENCES workouts (id),
+    exercise_id INTEGER REFERENCES exercises (id),
+    PRIMARY KEY (workout_id, exercise_id)
 );
 
 CREATE TABLE workouts_archive

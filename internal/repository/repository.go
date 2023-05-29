@@ -43,6 +43,6 @@ type Session interface {
 
 type Workout interface {
 	GetWorkoutByID(id int) (models.Workout, error)
-	InsertWorkout(workout models.Workout) (int, error)
+	InsertWorkout(workout models.Workout) (int64, error)
 }
 
