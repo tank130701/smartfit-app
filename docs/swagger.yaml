@@ -1,0 +1,327 @@
+basePath: /
+definitions:
+  handler.LoginRequest:
+    properties:
+      password:
+        description: Пароль пользователя.
+        type: string
+      username:
+        description: Имя пользователя.
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Exercise:
+    properties:
+      calories:
+        type: integer
+      id:
+        type: integer
+      reps:
+        items:
+          type: integer
+        type: array
+      sets:
+        type: integer
+      title:
+        type: string
+      weights:
+        items:
+          type: number
+        type: array
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      passwordHash:
+        items:
+          type: integer
+        type: array
+      username:
+        type: string
+    type: object
+  models.UserData:
+    properties:
+      age:
+        type: integer
+      calories:
+        type: integer
+      goal:
+        type: string
+      height:
+        type: integer
+      name:
+        type: string
+      place:
+        type: string
+      sex:
+        type: string
+      user_id:
+        type: integer
+      weight:
+        type: integer
+    type: object
+  models.Workout:
+    properties:
+      date:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/models.Exercise'
+        type: array
+      id:
+        type: integer
+      title:
+        type: string
+      workoutExercises:
+        items:
+          $ref: '#/definitions/models.WorkoutExercise'
+        type: array
+    type: object
+  models.WorkoutExercise:
+    properties:
+      exerciseID:
+        type: integer
+      workoutID:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for SmartFit Application
+  title: SmartFit App API
+  version: "1.0"
+paths:
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: get user
+      operationId: get-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BaseAuth: []
+      summary: Get User
+      tags:
+      - userdata
+  /api/userdata:
+    get:
+      consumes:
+      - application/json
+      description: get userdata by id
+      operationId: get-userdata-by-id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BaseAuth: []
+      summary: Get UserData By Id
+      tags:
+      - userdata
+    post:
+      consumes:
+      - application/json
+      description: create userdata
+      operationId: create-userdata
+      parameters:
+      - description: userdata
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BaseAuth: []
+      summary: Create userdata
+      tags:
+      - userdata
+  /api/workouts:
+    get:
+      consumes:
+      - application/json
+      description: get workouts
+      operationId: get-workouts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Workout'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BaseAuth: []
+      summary: Get Workouts
+      tags:
+      - workouts
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: login
+      operationId: login
+      parameters:
+      - description: Input request structure
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: session
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: create account
+      operationId: create-account
+      parameters:
+      - description: Input request structure
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignUp
+      tags:
+      - auth
+securityDefinitions:
+  BaseAuth:
+    type: basic
+swagger: "2.0"

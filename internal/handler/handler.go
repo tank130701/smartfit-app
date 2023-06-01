@@ -5,6 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
+	_ "my-app/docs"
 )
 
 type Handler struct {
@@ -20,6 +24,8 @@ func NewHandler(services *services.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.Default()
 
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
@@ -33,30 +39,27 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	})
 	api := router.Group("/api", h.authMiddleware)
 	{
-		public := api.Group("/public")
+		user := api.Group("/user")
 		{
-			user := public.Group("/user")
-			{
-				user.GET("/", h.getUser)
-				// user.DELETE("/", h.deleteUser)
-				// user.PUT("/", h.updateUser)
-			}
-			userData := public.Group("/userdata")
-			{
-				userData.POST("/", h.createUserData)
-				userData.GET("/", h.getUserData)
-				// user.DELETE("/", h.deleteUser)
-				// user.PUT("/", h.updateUser)
-			}
-			
-			workouts := public.Group("/workouts")
-			{
-				workouts.GET("/:id", h.getWorkoutById)
-				workouts.POST("/new", h.insertWorkout)
-			}
+			user.GET("/", h.getUser)
+			// user.DELETE("/", h.deleteUser)
+			// user.PUT("/", h.updateUser)
 		}
-	}
+		userData := api.Group("/userdata")
+		{
+			userData.POST("/", h.createUserData)
+			userData.GET("/", h.getUserData)
+			// user.DELETE("/", h.deleteUser)
+			// user.PUT("/", h.updateUser)
+		}
+		
+		workouts := api.Group("/workouts")
+		{
+			workouts.GET("/:id", h.getWorkoutById)
+			workouts.GET("/", h.getWorkouts)
+			workouts.POST("/new", h.insertWorkout)
+		}
 	// h.initAuthRoutes(router)
-
 	return router
+	}
 }

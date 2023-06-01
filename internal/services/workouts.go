@@ -29,3 +29,7 @@ func (s *WorkoutsService) GetWorkout(id int) (models.Workout, error) {
 	}
 	return workout, nil
 }
+
+func (s *WorkoutsService) GetWorkouts() ([]models.Workout, error) {
+	return s.r.GetWorkouts()
+}

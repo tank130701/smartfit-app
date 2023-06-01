@@ -1,0 +1,8 @@
+port: "8080"
+
+db:
+    username: "val1"
+    host: "194.87.110.172"
+    port: "5432"
+    dbname: "my-app"
+    sslmode: "disable"

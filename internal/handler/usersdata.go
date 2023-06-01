@@ -10,6 +10,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+// @Summary Create userdata
+// @Security BaseAuth
+// @Tags userdata
+// @Description create userdata
+// @ID create-userdata
+// @Accept  json
+// @Produce  json
+// @Param input body models.UserData true "userdata"
+// @Success 200 {integer} integer 1
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/userdata [post]
 func (h *Handler) createUserData(c *gin.Context) {
 	userId, err := getUserId(c)
 	// fmt.Println("User ID in handler: ", userId)
@@ -35,7 +49,18 @@ func (h *Handler) createUserData(c *gin.Context) {
 	})
 }
 
-
+// @Summary Get UserData By Id
+// @Security BaseAuth
+// @Tags userdata
+// @Description get userdata by id
+// @ID get-userdata-by-id
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.UserData
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/userdata [get]
 func (h *Handler) getUserData(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {

@@ -38,7 +38,7 @@ CREATE TABLE exercises (
     title TEXT NOT NULL,
     sets INTEGER NOT NULL,
     reps INTEGER[] NOT NULL,
-    weights INTEGER[] NOT NULL,
+    weights INTEGER[],
     calories INTEGER NOT NULL
 );
 

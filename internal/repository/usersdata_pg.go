@@ -34,9 +34,9 @@ func (r *UsersDataPostgresRepository) Create(userId int, userData models.UserDat
 	return int(LastInsertId), nil
 }
 
-func (m *UsersDataPostgresRepository) Get(id int) (models.UserData, error) {
+func (r *UsersDataPostgresRepository) Get(id int) (models.UserData, error) {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", usersDataTable)
-	row := m.db.QueryRow(query, id)
+	row := r.db.QueryRow(query, id)
 	UsersData := new(models.UserData)
 
 	err := row.Scan(&UsersData.UserID, &UsersData.Name, &UsersData.Age,

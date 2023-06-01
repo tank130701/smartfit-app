@@ -18,8 +18,8 @@ func NewWorkoutsPostgresRepository(db *sqlx.DB) *WorkoutsPostgresRepository {
 	}
 }
 
-func (m *WorkoutsPostgresRepository) InsertWorkout(workout models.Workout) (int64, error) {
-	tx := m.db.MustBegin()
+func (r *WorkoutsPostgresRepository) InsertWorkout(workout models.Workout) (int64, error) {
+	tx := r.db.MustBegin()
 	defer tx.Rollback()
 
 	// Вставляем данные в таблицу workouts
@@ -62,9 +62,9 @@ func (m *WorkoutsPostgresRepository) InsertWorkout(workout models.Workout) (int6
 }
 
 
-func (m *WorkoutsPostgresRepository) GetWorkoutByID(id int) (models.Workout, error) {
+func (r *WorkoutsPostgresRepository) GetWorkoutByID(id int) (models.Workout, error) {
 	var w models.Workout
-    err := m.db.Get(&w, `
+    err := r.db.Get(&w, `
         SELECT *
         FROM workouts
         WHERE id = $1`, id)
@@ -75,7 +75,7 @@ func (m *WorkoutsPostgresRepository) GetWorkoutByID(id int) (models.Workout, err
     // Запрашиваем данные упражнений, связанных с этой тренировкой
     // exercises := []*models.Exercise{}
     var exercises []models.Exercise
-    err = m.db.Select(&exercises, `
+    err = r.db.Select(&exercises, `
         SELECT e.*
         FROM exercises e
         JOIN workout_exercises we ON we.exercise_id = e.id
@@ -90,6 +90,33 @@ func (m *WorkoutsPostgresRepository) GetWorkoutByID(id int) (models.Workout, err
     return w, nil
 }
 
+func (r *WorkoutsPostgresRepository) GetWorkouts() ([]models.Workout, error) {
+	var workouts []models.Workout
+    err := r.db.Select(&workouts, `
+        SELECT *
+        FROM workouts
+        ORDER BY date DESC
+        LIMIT 3;`)
+    if err != nil {
+        return nil, err
+    }
+    
+    // Получаем данные упражнений, связанных с каждой тренировкой
+    for i, workout := range workouts {
+        exercises := []models.Exercise{}
+        err = r.db.Select(&exercises, `
+            SELECT e.*
+            FROM exercises e
+            JOIN workout_exercises we ON we.exercise_id = e.id
+            WHERE we.workout_id = $1`, workout.ID)
+        if err != nil {
+            return nil, err
+        }
+        workouts[i].Exercises = exercises
+    }
+
+    return workouts, nil
+}
 
 func scanReps(reps []uint8) ([]int, error) {
     var result []int

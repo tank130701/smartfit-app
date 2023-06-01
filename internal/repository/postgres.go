@@ -15,14 +15,24 @@ const (
 	workoutsArchiveTable = "workouts_archive"
 )
 
-func NewPostgresConnection(host string, username string, password string, port int, dbname string) (*sqlx.DB, error) {
+type Config struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+	SSLMode  string
+}
+
+func NewPostgresConnection(cfg Config) (*sqlx.DB, error) {
 	psqlInfo := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host,
-		port,
-		username,
-		password,
-		dbname,
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		cfg.Host,
+		cfg.Port,
+		cfg.Username,
+		cfg.Password,
+		cfg.DBName,
+		cfg.SSLMode,
 	)
 	db, err := sqlx.Open("postgres", psqlInfo)
 	if err != nil {
