@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"encoding/json"
 	"my-app/internal/models"
 
 	"github.com/jmoiron/sqlx"
@@ -118,11 +117,3 @@ func (r *WorkoutsPostgresRepository) GetWorkouts() ([]models.Workout, error) {
     return workouts, nil
 }
 
-func scanReps(reps []uint8) ([]int, error) {
-    var result []int
-    err := json.Unmarshal(reps, &result)
-    if err != nil {
-        return nil, err
-    }
-    return result, nil
-}

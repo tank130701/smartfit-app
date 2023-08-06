@@ -19,8 +19,6 @@ func NewUsersDataPostgresRepository(db *sqlx.DB) *UsersDataPostgresRepository {
 }
 
 func (r *UsersDataPostgresRepository) Create(userId int, userData models.UserData) (int, error) {
-	//TODO implement me
-	//panic("implement me")
 	fmt.Println(userData)
 	var LastInsertId int
 	query := fmt.Sprintf(
