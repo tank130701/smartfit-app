@@ -1,3 +1,3 @@
 # smartfit-app
 Данный проект представляет собой REST API для приложения треннировок
-## GOLANG REST API + PostgreSQL
+# GOLANG REST API + PostgreSQL
